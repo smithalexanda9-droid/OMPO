@@ -1,0 +1,158 @@
+[
+  {
+    "id": "GnZ",
+    "name": "GnZ",
+    "glass": "",
+    "description": "A bold coffee-infused gin cocktail.",
+    "ingredients": [
+      { "item": "Gin (Gilbeys)" },
+      { "item": "Coffee" },
+      { "item": "Simple Syrup" },
+      { "item": "Lime Cordial" },
+      { "item": "Tonic" },
+      { "item": "Garnish (Coffee Beans)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "WheZee",
+    "name": "WheZee",
+    "glass": "",
+    "description": "Smooth whiskey blend with Amarula.",
+    "ingredients": [
+      { "item": "Whiskey (Highland Queen)" },
+      { "item": "Coffee" },
+      { "item": "Amarula" },
+      { "item": "Lime Cordial" },
+      { "item": "Choco Syrup" },
+      { "item": "Tonic" },
+      { "item": "Garnish (Coffee Beans)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Gin_Tonic",
+    "name": "Gin & Tonic",
+    "glass": "",
+    "description": "Classic refreshing gin & tonic.",
+    "ingredients": [
+      { "item": "Gin (Beefeater London Dry)" },
+      { "item": "Simple Syrup" },
+      { "item": "Tonic" },
+      { "item": "Garnish (Lime Wheel & Cucumber)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Ms_Steak",
+    "name": "Ms Steak",
+    "glass": "",
+    "description": "Citrusy whiskey cocktail for steak lovers.",
+    "ingredients": [
+      { "item": "Whiskey (Highland Queen)" },
+      { "item": "Ginger Syrup" },
+      { "item": "Lime" },
+      { "item": "Soda Water" },
+      { "item": "Garnish (Salt & Pepper)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Beef_In",
+    "name": "Beef In",
+    "glass": "",
+    "description": "Refreshing vodka cucumber cocktail.",
+    "ingredients": [
+      { "item": "Vodka (Absolute)" },
+      { "item": "Cucumber Syrup" },
+      { "item": "Lime" },
+      { "item": "Hibiscus Syrup" },
+      { "item": "Soda Water" },
+      { "item": "Garnish (Cucumber Strip)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Pink_Lady",
+    "name": "Pink Lady",
+    "glass": "",
+    "description": "Sweet vodka strawberry cocktail.",
+    "ingredients": [
+      { "item": "Vodka (Absolute)" },
+      { "item": "Strawberry Puree" },
+      { "item": "Lime" },
+      { "item": "Soda Water" },
+      { "item": "Garnish (Strawberry)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Margarita",
+    "name": "Margarita",
+    "glass": "",
+    "description": "Tequila-based classic cocktail.",
+    "ingredients": [
+      { "item": "Tequila (Jose Cuervo)" },
+      { "item": "Triple Sec" },
+      { "item": "Lime" },
+      { "item": "Garnish (Salt & Pepper)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Long_Island",
+    "name": "Long Island",
+    "glass": "",
+    "description": "Powerful mix of five spirits.",
+    "ingredients": [
+      { "item": "Rum (KC)" },
+      { "item": "Tequila (Jose Cuervo)" },
+      { "item": "Vodka (Absolute)" },
+      { "item": "Whiskey (Highland Queen)" },
+      { "item": "Gin (Gilbeys)" },
+      { "item": "Lime Cordial" },
+      { "item": "Coke" },
+      { "item": "Garnish (Lime Wheel & Cucumber)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Mojito",
+    "name": "Mojito",
+    "glass": "",
+    "description": "Classic rum, mint & lime refresher.",
+    "ingredients": [
+      { "item": "Rum (KC)" },
+      { "item": "Lime" },
+      { "item": "Syrup" },
+      { "item": "Soda Water" },
+      { "item": "Garnish (Cucumber & Mint)" },
+      { "item": "Ice" }
+    ]
+  },
+  {
+    "id": "Strawberry_Fizz",
+    "name": "Strawberry Fizz",
+    "glass": "",
+    "description": "Fruity mocktail with strawberry & lime.",
+    "ingredients": [
+      { "item": "Strawberry Puree" },
+      { "item": "Lime Juice" },
+      { "item": "Soda Water" },
+      { "item": "Garnish (Strawberry)" }
+    ]
+  },
+  {
+    "id": "Tropical_Breeze",
+    "name": "Tropical Breeze",
+    "glass": "",
+    "description": "Light tropical mocktail with pineapple.",
+    "ingredients": [
+      { "item": "Pineapple Juice" },
+      { "item": "Passion Puree" },
+      { "item": "Lemon Juice" },
+      { "item": "Mint" },
+      { "item": "Soda Water" }
+    ]
+  }
+]

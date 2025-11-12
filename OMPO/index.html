@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OMPO | Build Your Cocktail Experience</title>
+
+<!-- ✅ Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          charcoal: '#36454F',
+          cream: '#F5F5F0',
+          gold: '#D4AF37'
+        }
+      }
+    }
+  }
+</script>
+
+<!-- ✅ jsPDF for Downloading Summary -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+  body { background: #F5F5F0; color: #36454F; }
+  .card { background:#fff; border-radius:12px; box-shadow:0 6px 20px rgba(54,69,79,0.08); }
+  .pill { background: rgba(212,175,55,0.12); color: #D4AF37; padding:6px 10px; border-radius:999px; font-weight:600;}
+  .muted { color:#6b7280; }
+  .section-title { border-left:4px solid #D4AF37; padding-left:12px; margin-bottom:12px; font-weight:700; }
+  .container { max-width:1100px; margin-left:auto; margin-right:auto; padding-left:16px; padding-right:16px;}
+  .selected { background-color: #D4AF37; color: #F5F5F0; }
+</style>
+</head>
+<body class="font-sans">
+
+<header class="py-6">
+  <div class="container flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-12 h-12 rounded-full bg-charcoal flex items-center justify-center text-cream font-bold">OM</div>
+      <div>
+        <div class="text-xl font-bold">OMPO</div>
+        <div class="text-sm muted">Premium Cocktail Experiences</div>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center space-x-4">
+      <span class="pill">Craft • Taste • Theatre</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- START SCREEN -->
+  <section class="text-center py-8 mb-6" id="startScreen">
+    <h1 class="text-3xl md:text-4xl font-extrabold">Craft your perfect cocktail experience</h1>
+    <p class="muted mt-2 max-w-2xl mx-auto">
+      Walk through a simple configurator — pick a service tier, choose cocktails, syrups and garnish,
+      confirm staffing and add-ons. When you're done, the system will create a polished summary you
+      can send to OMPO over WhatsApp or download.
+    </p>
+    <div class="mt-6 flex justify-center">
+      <button id="start" class="bg-gold text-cream font-bold py-3 px-6 rounded-full hover:scale-105 transition">
+        Begin
+      </button>
+    </div>
+  </section>
+
+  <!-- APPLICATION AREA -->
+  <div id="app" class="hidden">
+
+    <!-- STEP NAVIGATOR -->
+    <div class="mb-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div id="stepNav1" class="card p-3 text-sm text-center">1. Contact</div>
+      <div id="stepNav2" class="card p-3 text-sm text-center muted">2. Event</div>
+      <div id="stepNav3" class="card p-3 text-sm text-center muted">3. Service</div>
+      <div id="stepNav4" class="card p-3 text-sm text-center muted">4. Drinks</div>
+      <div id="stepNav5" class="card p-3 text-sm text-center muted">5. Finish</div>
+    </div>
+
+    <!-- STEP 1: CONTACT -->
+    <section id="step1" class="card p-6 mb-6">
+      <div class="section-title">Tell us about you</div>
+      <form id="contactForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Full name *</label>
+          <input id="clientName" required class="w-full p-3 rounded border" placeholder="e.g. Alexanda Odhiambo">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Phone number *</label>
+          <input id="clientPhone" required class="w-full p-3 rounded border" placeholder="+2547....">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Company (optional)</label>
+          <input id="clientCompany" class="w-full p-3 rounded border" placeholder="Optional">
+        </div>
+
+        <div class="md:col-span-3 flex justify-end mt-3">
+          <button type="submit" class="bg-gold text-cream font-bold py-2 px-5 rounded">
+            Continue to event details
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- STEP 2: EVENT -->
+    <section id="step2" class="card p-6 mb-6 hidden">
+      <div class="section-title">Event information</div>
+      <form id="eventForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Event name *</label>
+          <input id="eventName" class="w-full p-3 rounded border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Event date *</label>
+          <input id="eventDate" type="date" class="w-full p-3 rounded border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Start time *</label>
+          <input id="startTime" type="time" class="w-full p-3 rounded border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">End time *</label>
+          <input id="endTime" type="time" class="w-full p-3 rounded border" required>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-semibold mb-1">Venue / Location *</label>
+          <input id="venue" class="w-full p-3 rounded border" required>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Indoor / Outdoor *</label>
+          <select id="indoorOutdoor" class="w-full p-3 rounded border">
+            <option>Indoor</option>
+            <option>Outdoor</option>
+            <option>Mixed</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">Estimated guests *</label>
+          <input id="guestCount" type="number" class="w-full p-3 rounded border" min="1" value="50" required>
+        </div>
+
+        <div class="md:col-span-2 flex justify-between items-center mt-3">
+          <button id="backTo1" type="button" class="py-2 px-4 rounded border">Back</button>
+          <button id="toService" type="button" class="bg-gold text-cream font-bold py-2 px-4 rounded">Continue to service</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- STEP 3: SERVICE -->
+    <section id="step3" class="card p-6 mb-6 hidden">
+      <div class="section-title">Choose a service tier</div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <label class="p-4 border rounded hover:shadow cursor-pointer">
+          <input type="radio" name="serviceTier" value="serviceOnly" class="mr-2"> <strong>Service Only</strong>
+        </label>
+        <label class="p-4 border rounded hover:shadow cursor-pointer">
+          <input type="radio" name="serviceTier" value="servicePrep" class="mr-2"> <strong>Service + Prep</strong>
+        </label>
+        <label class="p-4 border rounded hover:shadow cursor-pointer">
+          <input type="radio" name="serviceTier" value="fullExperience" class="mr-2"> <strong>Full Experience</strong>
+        </label>
+      </div>
+
+      <div class="mt-4 flex justify-between">
+        <button id="backTo2" class="py-2 px-4 rounded border">Back</button>
+        <button id="toDrinks" class="bg-gold text-cream font-bold py-2 px-4 rounded">Build drinks menu</button>
+      </div>
+    </section>
+
+    <!-- STEP 4: DRINKS -->
+    <section id="step4" class="card p-6 mb-6 hidden">
+      <div class="section-title">Drinks — choose cocktails, mocktails & spirits</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Cocktails -->
+        <div>
+          <h3 class="font-bold mb-2">Cocktail catalogue</h3>
+          <div id="cocktailList" class="space-y-3 max-h-72 overflow-auto pr-3"></div>
+        </div>
+
+        <!-- Spirits -->
+        <div>
+          <h3 class="font-bold mb-2">Spirits & mocktails</h3>
+          <div class="mb-2">
+            <select id="beverageType" class="w-full p-2 rounded border">
+              <option value="">Select Beverage Type</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <select id="productName" class="w-full p-2 rounded border">
+              <option value="">Select Product</option>
+            </select>
+          </div>
+          <button id="addSpirit" class="bg-gold text-cream font-bold py-2 px-4 rounded mb-2">Add Spirit</button>
+          <div id="spiritList" class="max-h-72 overflow-auto space-y-1"></div>
+        </div>
+      </div>
+
+      <div class="mt-4 flex justify-between">
+        <button id="backTo3" class="py-2 px-4 rounded border">Back</button>
+        <button id="toFinish" class="bg-gold text-cream font-bold py-2 px-4 rounded">Review & finish</button>
+      </div>
+    </section>
+
+    <!-- STEP 5: FINISH -->
+    <section id="step5" class="card p-6 mb-12 hidden">
+      <div class="section-title">Your event summary</div>
+      <div id="summaryArea" class="space-y-3"></div>
+
+      <div class="mt-4 flex flex-col md:flex-row items-stretch md:items-center gap-3">
+        <button id="downloadPdf" class="bg-charcoal text-cream font-bold py-2 px-4 rounded w-full md:w-auto">
+          Download / Print
+        </button>
+        <button id="sendWhatsApp" class="bg-green-600 text-cream font-bold py-2 px-4 rounded w-full md:w-auto">
+          Send to OMPO on WhatsApp
+        </button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="py-8">
+  <div class="container text-center muted text-sm">
+    OMPO — Crafted flavour experiences.
+  </div>
+</footer>
+
+<!-- ✅ Load script at the end -->
+<script defer src="./script.js"></script>
+</body>
+</html>

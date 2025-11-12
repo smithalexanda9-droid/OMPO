@@ -1,0 +1,69 @@
+[
+  {
+    "beverageType": "Liqueur",
+    "products": [
+      "Jägermeister",
+      "Malibu",
+      "Zappa",
+      "Triple Sec",
+      "Amarula"
+    ]
+  },
+  {
+    "beverageType": "Tequila",
+    "products": [
+      "Olmeca Silver",
+      "Olmeca Gold",
+      "Jose Cuervo Gold",
+      "Jose Cuervo Silver"
+    ]
+  },
+  {
+    "beverageType": "Brandy",
+    "products": [
+      "Bardinet Coffee",
+      "Metaxa"
+    ]
+  },
+  {
+    "beverageType": "Gin",
+    "products": [
+      "Best Dry Gin",
+      "Gilbeys Gin",
+      "Beefeater London Dry Gin"
+    ]
+  },
+  {
+    "beverageType": "Whiskey",
+    "products": [
+      "Highland Queen",
+      "Jack Daniels",
+      "Jameson"
+    ]
+  },
+  {
+    "beverageType": "Vodka",
+    "products": [
+      "Vodka Absolut",
+      "Smirnoff Vodka"
+    ]
+  },
+  {
+    "beverageType": "Rum",
+    "products": [
+      "Barcadi Rum",
+      "KC Rum"
+    ]
+  },
+  {
+    "beverageType": "Soda",
+    "products": [
+      "Club Tangawizi",
+      "Soda Water",
+      "Tonic Water",
+      "Royal Club",
+      "Coca Cola",
+      "Sprite"
+    ]
+  }
+]

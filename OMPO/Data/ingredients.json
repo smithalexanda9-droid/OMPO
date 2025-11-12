@@ -1,0 +1,126 @@
+[
+  {
+    "id": "GnZ",
+    "name": "GnZ",
+    "ingredients": [
+      "Coffee",
+      "Simple Syrup",
+      "Lime Cordial",
+      "Tonic",
+      "Garnish (Coffee Beans)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "WheeZee",
+    "name": "Wheezee",
+    "ingredients": [
+      "Coffee",
+      "Amarula",
+      "Lime Cordial",
+      "Choco Syrup",
+      "Tonic",
+      "Garnish (Coffee Beans)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Gin_Tonic",
+    "name": "Gin & Tonic",
+    "ingredients": [
+      "Simple Syrup",
+      "Tonic",
+      "Garnish (Lime Wheel & Cucumber)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Ms_Steak",
+    "name": "Ms Steak",
+    "ingredients": [
+      "Ginger Syrup",
+      "Lime",
+      "Soda Water",
+      "Garnish (Salt & Pepper)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Beef_In",
+    "name": "BeefIn",
+    "ingredients": [
+      "Cucumber Syrup",
+      "Lime",
+      "Hibiscus Syrup",
+      "Soda Water",
+      "Garnish (Cucumber Strip)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Pink_Lady",
+    "name": "Pink Lady",
+    "ingredients": [
+      "Strawberry Puree",
+      "Lime",
+      "Soda Water",
+      "Garnish (Strawberry)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Margarita",
+    "name": "Margarita",
+    "ingredients": [
+      "Triple Sec",
+      "Lime",
+      "Garnish (Salt & Pepper)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Long_Island",
+    "name": "Long Island",
+    "ingredients": [
+      "Lime Cordial",
+      "Coke",
+      "Garnish (Lime Wheel & Cucumber)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Mojito",
+    "name": "Mojito",
+    "ingredients": [
+      "Lime",
+      "Syrup",
+      "Soda Water",
+      "Garnish (Cucumber & Mint)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Strawberry_Fizz",
+    "name": "Strawberry Fizz",
+    "category": "Mocktail",
+    "ingredients": [
+      "Strawberry Puree",
+      "Lime Juice",
+      "Soda Water",
+      "Garnish (Strawberry)",
+      "Ice"
+    ]
+  },
+  {
+    "id": "Tropical_Breeze",
+    "name": "Tropical Breeze",
+    "category": "Mocktail",
+    "ingredients": [
+      "Pineapple Juice",
+      "Passion Puree",
+      "Lemon Juice",
+      "Mint",
+      "Soda Water"
+    ]
+  }
+]
