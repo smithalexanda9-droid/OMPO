@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMPO — Its Yours for the Taking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@300;400;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --ink: #08060A;
+  --amber: #edece9;
+  --amber2: #716d64;
+  --amber3: #96948f;
+  --cream: #F7F2EA;
+  --warm: #1C1610;
+  --muted: #7a6f63;
+  --surface: #F0E8D8;
+}
+html { scroll-behavior: auto; }
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Syne', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor { position: fixed; width: 8px; height: 8px; background: var(--amber); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .3s, height .3s, background .3s; }
+#cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(184,131,42,.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: left .1s, top .1s; }
+body:hover ~ #cursor { opacity: 1; }
+
+/* ── CANVAS (WebGPU) ── */
+#webgpu-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+#hero #webgpu-canvas {
+  position: absolute;
+  z-index: 1;
+  opacity: 1;
+}
+
+/* ── SCROLL CONTAINER ── */
+#scroll-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.5rem 3.5rem;
+  mix-blend-mode: normal;
+  transition: background .5s;
+}
+nav.bg { background: rgba(8,6,10,.85); backdrop-filter: blur(12px); }
+.nav-logo { display: flex; align-items: center; gap: .7rem; text-decoration: none; }
+.nav-logo svg { width: 28px; height: 28px; }
+.nav-logo-text { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-style: italic; color: var(--cream); }
+.nav-logo-text span { color: var(--amber); }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a { color: rgba(247,242,234,.55); text-decoration: none; font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; transition: color .3s; }
+.nav-links a:hover { color: var(--amber); }
+.nav-cta { background: var(--amber) !important; color: var(--ink) !important; padding: .45rem 1.3rem; font-weight: 700 !important; }
+.nav-cta:hover { background: var(--amber2) !important; }
+
+/* ── SECTION BASE ── */
+.chapter {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  padding: 6rem 3.5rem;
+}
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 3.5rem;
+  overflow: hidden;
+}
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 480px;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: levitate 4s ease-in-out infinite;
+}
+@keyframes levitate {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+.hero-eyebrow {
+  font-size: .62rem; letter-spacing: .45em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 1.8rem; display: block;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(4.5rem, 10vw, 10rem);
+  line-height: .88; font-style: italic; font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+.hero-title .sub {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--amber);
+  font-style: normal; font-size: .45em;
+  letter-spacing: .35em; font-family: 'Syne', sans-serif; font-weight: 800;
+  margin-top: .5rem;
+}
+.hero-tagline {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 1.1rem; color: rgba(247,242,234,.5); margin-bottom: 2.5rem; line-height: 1.7;
+}
+.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn-gold {
+  background: var(--amber); color: var(--ink);
+  padding: .9rem 2.2rem; font-size: .7rem; letter-spacing: .2em;
+  text-transform: uppercase; font-weight: 700; font-family: 'Syne', sans-serif;
+  border: none; cursor: pointer; transition: background .3s, transform .2s;
+  text-decoration: none; display: inline-block;
+}
+.btn-gold:hover { background: var(--amber2); transform: translateY(-2px); }
+.btn-wire {
+  background: transparent; color: var(--cream);
+  padding: .9rem 2.2rem; font-size: .7rem; letter-spacing: .2em;
+  text-transform: uppercase; font-family: 'Syne', sans-serif;
+  border: 1px solid rgba(247,242,234,.2); cursor: pointer;
+  transition: all .3s; text-decoration: none; display: inline-block;
+}
+.btn-wire:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-2px); }
+.hero-scroll-hint {
+  position: absolute; bottom: 3rem; left: 3.5rem;
+  display: flex; align-items: center; gap: .8rem;
+  opacity: .35; z-index: 2;
+}
+.hero-scroll-hint span { font-size: .6rem; letter-spacing: .25em; text-transform: uppercase; }
+.scroll-bar { width: 1px; height: 50px; background: var(--cream); transform-origin: top; animation: shrink 1.8s ease-in-out infinite; }
+@keyframes shrink { 0%,100%{transform:scaleY(.5);opacity:.4} 50%{transform:scaleY(1);opacity:1} }
+
+/* ── SCROLL STRIP ── */
+.strip {
+  background: var(--amber); padding: 1rem 3.5rem;
+  display: flex; justify-content: center; align-items: center; gap: 2.5rem; flex-wrap: wrap;
+  position: relative; z-index: 2;
+}
+.strip-item { font-size: .63rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink); font-weight: 700; }
+.strip-dot { width: 4px; height: 4px; background: rgba(10,7,5,.3); border-radius: 50%; flex-shrink: 0; }
+
+/* ── JOURNEY SECTIONS ── */
+.journey-section {
+  min-height: 100vh; position: relative;
+  display: flex; align-items: center;
+  padding: 6rem 3.5rem;
+  overflow: hidden;
+}
+
+/* left text / right visual layout */
+.js-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+  max-width: 1100px; width: 100%; margin: 0 auto;
+  position: relative; z-index: 2;
+}
+.js-inner.reverse { direction: rtl; }
+.js-inner.reverse > * { direction: ltr; }
+
+.js-text { }
+.js-eyebrow { font-size: .6rem; letter-spacing: .35em; text-transform: uppercase; color: var(--amber); margin-bottom: 1rem; display: block; }
+.js-title { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 4.5vw, 3.5rem); font-style: italic; line-height: 1.1; margin-bottom: 1.2rem; font-weight: 700; }
+.js-title em { color: var(--amber); font-style: italic; }
+.js-divline { width: 45px; height: 2px; background: var(--amber); margin-bottom: 1.5rem; opacity: .7; }
+.js-body { font-size: .9rem; line-height: 1.95; color: rgba(247,242,234,.55); font-family: 'Playfair Display', serif; max-width: 440px; }
+.js-tag { display: inline-block; margin-top: 1.5rem; font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--amber); border: 1px solid rgba(184,131,42,.3); padding: .3rem .9rem; }
+
+/* visual panels for each chapter */
+.js-visual { display: flex; align-items: center; justify-content: center; position: relative; min-height: 420px; }
+
+/* Chapter 1 — Origins */
+#origins { background: linear-gradient(180deg, #08060A 0%, #0f0a06 100%); }
+.origins-art { position: relative; width: 320px; height: 380px; }
+.earth-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(184,131,42,.12); }
+.er1 { width: 320px; height: 320px; top: 30px; left: 0; animation: spin 30s linear infinite; }
+.er2 { width: 220px; height: 220px; top: 80px; left: 50px; animation: spin 18s linear infinite reverse; }
+.er3 { width: 120px; height: 120px; top: 130px; left: 100px; animation: spin 10s linear infinite; }
+@keyframes spin { 0%{transform:rotate(0)}100%{transform:rotate(360deg)} }
+.origin-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-45%); text-align: center; }
+.origin-center .big { font-family: 'Playfair Display',serif; font-size: 5.5rem; font-style: italic; color: rgba(184,131,42,.12); line-height: 1; display: block; }
+.ingredients-list { display: flex; flex-direction: column; gap: .5rem; margin-top: 1.5rem; }
+.ing-item { display: flex; align-items: center; gap: .7rem; font-size: .75rem; color: rgba(247,242,234,.45); letter-spacing: .08em; }
+.ing-dot { width: 5px; height: 5px; background: var(--amber); border-radius: 50%; flex-shrink: 0; }
+
+/* Chapter 2 — Transformation */
+#transform { background: linear-gradient(180deg, #0f0a06 0%, #100d08 100%); }
+.transform-art { position: relative; width: 280px; height: 400px; display: flex; align-items: center; justify-content: center; }
+.shaker { position: relative; z-index: 2; }
+.shaker-body { width: 80px; height: 200px; background: rgba(184,131,42,.08); border: 1px solid rgba(184,131,42,.35); border-radius: 8px 8px 30px 30px; position: relative; overflow: hidden; animation: shake 3s ease-in-out infinite; }
+@keyframes shake { 0%,100%{transform:rotate(-3deg) translateY(0)} 25%{transform:rotate(3deg) translateY(-8px)} 50%{transform:rotate(-2deg) translateY(-4px)} 75%{transform:rotate(2deg) translateY(-10px)} }
+.shaker-liquid { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: rgba(184,131,42,.18); animation: slosh 3s ease-in-out infinite; }
+@keyframes slosh { 0%,100%{border-radius: 0 0 30px 30px; height:60%} 50%{border-radius:10px 10px 30px 30px; height:52%} }
+.shaker-top { width: 86px; height: 30px; background: rgba(184,131,42,.2); border: 1px solid rgba(184,131,42,.3); border-bottom: none; border-radius: 6px 6px 0 0; margin-bottom: -1px; margin-left: -3px; }
+.shaker-cap { width: 88px; height: 14px; background: rgba(184,131,42,.45); border-radius: 4px 4px 0 0; margin-bottom: -1px; margin-left: -4px; }
+.pour-drops { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.drop { width: 4px; height: 4px; background: var(--amber); border-radius: 50%; animation: drip 1.5s ease-in infinite; opacity: 0; }
+.drop:nth-child(1) { animation-delay: 0s; }
+.drop:nth-child(2) { animation-delay: .3s; width: 3px; height: 3px; }
+.drop:nth-child(3) { animation-delay: .6s; width: 2px; height: 2px; }
+@keyframes drip { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(24px);opacity:0} }
+.cocktail-names-float { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+.cn-item { position: absolute; font-family: 'Playfair Display', serif; font-style: italic; font-size: .78rem; color: rgba(184,131,42,.4); white-space: nowrap; animation: floatAround 6s ease-in-out infinite; }
+.cn-item:nth-child(1) { top: 10%; left: -20px; animation-delay: 0s; }
+.cn-item:nth-child(2) { top: 30%; right: -30px; animation-delay: 1s; }
+.cn-item:nth-child(3) { top: 55%; left: -40px; animation-delay: 2s; }
+.cn-item:nth-child(4) { top: 75%; right: -20px; animation-delay: .5s; }
+.cn-item:nth-child(5) { bottom: 10%; left: 10px; animation-delay: 1.5s; }
+@keyframes floatAround { 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-10px);opacity:.7} }
+
+/* Chapter 3 — The Pour */
+#pour { background: linear-gradient(180deg, #100d08 0%, #0c0907 100%); }
+.pour-art { position: relative; width: 220px; height: 380px; display: flex; flex-direction: column; align-items: center; }
+.glass-3d { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; margin-top: 60px; }
+.glass-bowl { width: 140px; height: 160px; border: 1px solid rgba(184,131,42,.45); border-radius: 0 0 70px 70px; border-top: none; overflow: hidden; position: relative; }
+.glass-liquid { position: absolute; bottom: 0; left: 0; right: 0; height: 65%; background: rgba(184,131,42,.2); animation: swish 3s ease-in-out infinite; }
+@keyframes swish { 0%,100%{border-radius:0 0 70px 70px;height:65%} 50%{border-radius:8px 8px 70px 70px;height:59%} }
+.glass-label { position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%); font-family: 'Playfair Display', serif; font-style: italic; font-size: .55rem; color: rgba(184,131,42,.65); white-space: nowrap; }
+.glass-rim { width: 144px; height: 1px; background: rgba(184,131,42,.5); }
+.garnish-piece { position: absolute; top: -12px; right: 12px; width: 26px; height: 26px; border: 1px solid rgba(184,131,42,.4); border-radius: 50% 0 50% 50%; transform: rotate(35deg); animation: wobble 4s ease-in-out infinite; }
+@keyframes wobble { 0%,100%{transform:rotate(35deg)} 50%{transform:rotate(48deg)} }
+.glass-stem { width: 3px; height: 100px; background: rgba(184,131,42,.28); }
+.glass-base { width: 70px; height: 3px; background: rgba(184,131,42,.2); border-radius: 50%; }
+.glow-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-40%); width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(184,131,42,.08), transparent 70%); pointer-events: none; }
+.pour-stream { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 60px; background: linear-gradient(rgba(184,131,42,.6), rgba(184,131,42,.1)); border-radius: 2px; animation: pourStream 2s ease-in-out infinite; }
+@keyframes pourStream { 0%,100%{height:55px;opacity:.6} 50%{height:65px;opacity:1} }
+
+/* Chapter 4 — Lifestyle */
+#lifestyle { background: linear-gradient(180deg, #0c0907 0%, #08060A 100%); }
+.lifestyle-art { position: relative; width: 340px; height: 400px; display: flex; align-items: center; justify-content: center; }
+.lifestyle-cards { position: relative; width: 100%; height: 100%; }
+.lc { position: absolute; background: rgba(184,131,42,.04); border: 1px solid rgba(184,131,42,.15); padding: 1.2rem 1.5rem; transition: transform .4s, border-color .3s; }
+.lc:hover { border-color: rgba(184,131,42,.4); }
+.lc1 { top: 5%; left: 5%; width: 200px; transform: rotate(-4deg); animation: cardFloat1 5s ease-in-out infinite; }
+.lc2 { top: 25%; right: 2%; width: 180px; transform: rotate(3deg); animation: cardFloat2 6s ease-in-out infinite; }
+.lc3 { bottom: 10%; left: 8%; width: 190px; transform: rotate(2deg); animation: cardFloat3 4.5s ease-in-out infinite; }
+@keyframes cardFloat1 { 0%,100%{transform:rotate(-4deg) translateY(0)} 50%{transform:rotate(-3deg) translateY(-10px)} }
+@keyframes cardFloat2 { 0%,100%{transform:rotate(3deg) translateY(0)} 50%{transform:rotate(4deg) translateY(-8px)} }
+@keyframes cardFloat3 { 0%,100%{transform:rotate(2deg) translateY(0)} 50%{transform:rotate(1deg) translateY(-12px)} }
+.lc-label { font-size: .58rem; letter-spacing: .2em; text-transform: uppercase; color: var(--amber); margin-bottom: .4rem; }
+.lc-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: .9rem; color: rgba(247,242,234,.65); line-height: 1.4; }
+.lc-fig { width: 22px; margin-top: .5rem; opacity: .5; }
+
+/* ── MENU SECTION ── */
+#menu-section {
+  background: var(--ink);
+  padding: 8rem 3.5rem;
+  position: relative; z-index: 2;
+}
+.menu-wrapper { max-width: 1000px; margin: 0 auto; }
+.menu-head { text-align: center; margin-bottom: 5rem; }
+.sec-tag { font-size: .6rem; letter-spacing: .38em; text-transform: uppercase; color: var(--amber); margin-bottom: .8rem; display: block; }
+.menu-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-style: italic; color: var(--cream); font-weight: 400; }
+.menu-sub { font-family: 'Playfair Display', serif; font-style: italic; color: rgba(247,242,234,.3); font-size: .95rem; margin-top: .7rem; }
+.menu-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.col-label { font-size: .6rem; letter-spacing: .38em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; font-weight: 700; }
+.col-label::after { content: ''; flex: 1; height: 1px; background: rgba(184,131,42,.18); }
+.menu-item { display: flex; align-items: baseline; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(184,131,42,.07); gap: 1rem; }
+.menu-item:last-child { border-bottom: none; }
+.menu-item:hover .mi-name { color: var(--amber2); }
+.mi-name { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--cream); transition: color .3s; line-height: 1.2; }
+.mi-desc { font-size: .7rem; color: rgba(247,242,234,.3); margin-top: .2rem; }
+.mi-price { font-size: .88rem; font-weight: 700; color: var(--amber); white-space: nowrap; flex-shrink: 0; }
+.menu-divider { grid-column: 1/-1; display: flex; align-items: center; justify-content: center; padding: 1.5rem 0; }
+.md-line { flex: 1; height: 1px; background: rgba(184,131,42,.1); }
+.md-fig { width: 50px; margin: 0 2rem; opacity: .3; }
+.menu-note { text-align: center; margin-top: 3.5rem; padding: 2rem 2.5rem; border: 1px solid rgba(184,131,42,.12); max-width: 600px; margin-left: auto; margin-right: auto; }
+.menu-note p { font-family: 'Playfair Display', serif; font-style: italic; color: rgba(247,242,234,.4); font-size: .88rem; line-height: 1.9; }
+.menu-note strong { color: var(--amber); font-style: normal; font-family: 'Syne', sans-serif; font-size: .75rem; letter-spacing: .1em; }
+
+/* ── MANIFESTO ── */
+#manifesto {
+  background: var(--amber);
+  padding: 9rem 3.5rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+  z-index: 2;
+}
+.mani-bg-txt { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Playfair Display', serif; font-size: 17vw; font-style: italic; color: rgba(10,7,5,.05); white-space: nowrap; pointer-events: none; user-select: none; }
+.mani-fig { width: 65px; margin: 0 auto 2.5rem; opacity: .2; }
+.mani-quote { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.8rem); font-style: italic; color: var(--ink); font-weight: 400; line-height: 1.35; max-width: 760px; margin: 0 auto 1.8rem; position: relative; z-index: 2; }
+.mani-attr { font-size: .63rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(10,7,5,.45); position: relative; z-index: 2; }
+
+/* ── BOOKING ── */
+#booking {
+  background: var(--warm);
+  padding: 8rem 3.5rem;
+  position: relative; z-index: 2;
+}
+.booking-inner { display: grid; grid-template-columns: 1fr 1.2fr; gap: 5rem; align-items: start; max-width: 1100px; margin: 0 auto; }
+.bi-logo-row { display: flex; align-items: center; gap: .8rem; margin-bottom: 2rem; }
+.bi-fig { width: 42px; opacity: .7; }
+.bi-name { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-style: italic; color: var(--cream); }
+.bi-name span { color: var(--amber); }
+.booking-info h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-style: italic; color: var(--cream); line-height: 1.15; margin-bottom: .8rem; }
+.booking-info h2 span { color: var(--amber); }
+.bi-sub { font-size: .86rem; line-height: 1.9; color: rgba(247,242,234,.4); font-family: 'Playfair Display', serif; font-style: italic; margin-bottom: 2rem; }
+.contact-list { list-style: none; }
+.contact-list li { display: flex; align-items: flex-start; gap: .8rem; padding: .65rem 0; border-bottom: 1px solid rgba(184,131,42,.1); font-size: .8rem; color: rgba(247,242,234,.5); }
+.contact-list li strong { color: var(--amber); font-size: .57rem; letter-spacing: .18em; text-transform: uppercase; min-width: 58px; padding-top: 2px; flex-shrink: 0; }
+.form-card { background: rgba(10,7,5,.45); border: 1px solid rgba(184,131,42,.14); padding: 2.5rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; }
+.form-group label { font-size: .57rem; letter-spacing: .2em; text-transform: uppercase; color: var(--amber); font-weight: 700; }
+.form-group input, .form-group select, .form-group textarea { background: rgba(247,242,234,.04); border: 1px solid rgba(184,131,42,.18); color: var(--cream); padding: .78rem 1rem; font-size: .84rem; font-family: 'Syne', sans-serif; outline: none; transition: border-color .3s; width: 100%; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--amber); }
+.form-group input::placeholder, .form-group textarea::placeholder { color: rgba(247,242,234,.2); }
+.form-group select option { background: var(--warm); color: var(--cream); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-submit { width: 100%; background: var(--amber); color: var(--ink); padding: 1rem; font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; font-weight: 700; font-family: 'Syne', sans-serif; border: none; cursor: pointer; transition: background .3s, transform .2s; margin-top: .3rem; }
+.form-submit:hover { background: var(--amber2); transform: translateY(-1px); }
+.form-note { font-size: .62rem; color: rgba(247,242,234,.22); text-align: center; margin-top: .8rem; font-family: 'Playfair Display', serif; font-style: italic; }
+.success-msg { display: none; padding: 2.5rem; text-align: center; }
+.success-msg p { color: var(--amber); font-size: .9rem; font-family: 'Playfair Display', serif; font-style: italic; line-height: 1.8; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  border-top: 1px solid rgba(184,131,42,.1);
+  padding: 3rem 3.5rem;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;
+  position: relative; z-index: 2;
+}
+.f-logo-row { display: flex; align-items: center; gap: .7rem; }
+.f-fig { width: 26px; opacity: .4; }
+.f-name { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-style: italic; color: rgba(247,242,234,.6); }
+.f-name span { color: var(--amber); }
+.f-links { display: flex; gap: 2rem; }
+.f-links a { font-size: .6rem; letter-spacing: .15em; text-transform: uppercase; color: rgba(247,242,234,.3); text-decoration: none; transition: color .3s; }
+.f-links a:hover { color: var(--amber); }
+.f-ig { font-size: .65rem; letter-spacing: .1em; color: var(--amber); }
+.f-copy { font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(247,242,234,.2); }
+
+/* ── SECTION REVEAL ── */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s, transform .8s; }
+.revealed { opacity: 1; transform: none; }
+
+/* ── PARTICLE OVERLAY ── */
+#particles-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 1;
+}
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: var(--amber); z-index: 999;
+  width: 0%; transition: width .1s;
+}
+
+/* ── CHAPTER INDICATOR ── */
+#chapter-indicator {
+  position: fixed; right: 2rem; top: 50%; transform: translateY(-50%);
+  z-index: 100; display: flex; flex-direction: column; gap: .8rem;
+}
+.ci-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  border: 1px solid rgba(184,131,42,.4);
+  background: transparent; cursor: pointer; transition: all .3s;
+}
+.ci-dot.active { background: var(--amber); border-color: var(--amber); width: 8px; height: 8px; }
+.ci-label {
+  position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  font-size: .58rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--amber); white-space: nowrap; opacity: 0; transition: opacity .3s;
+  pointer-events: none;
+}
+.ci-dot:hover .ci-label { opacity: 1; }
+
+/* MOBILE */
+@media(max-width:900px){
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-links { display: none; }
+  .js-inner, .booking-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .js-inner.reverse { direction: ltr; }
+  .js-visual { order: -1; min-height: 280px; }
+  .chapter, .journey-section { padding: 5rem 1.5rem; }
+  #hero { padding: 8rem 1.5rem 5rem; }
+  .hero-scroll-hint { left: 1.5rem; }
+  .menu-cols { grid-template-columns: 1fr; }
+  #menu-section, #manifesto, #booking { padding: 5rem 1.5rem; }
+  footer { padding: 2.5rem 1.5rem; flex-direction: column; align-items: flex-start; }
+  #chapter-indicator { display: none; }
+  .strip { padding: .9rem 1.5rem; gap: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── CURSOR ── -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<canvas id="webgpu-canvas"></canvas>
+
+<!-- ── PROGRESS BAR ── -->
+<div id="progress-bar"></div>
+
+<!-- ── REUSABLE OMPO FIGURE SYMBOL ── -->
+<svg style="display:none" aria-hidden="true" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" enable-background="new 0 0 1024 1024" xml:space="preserve">
+  <symbol id="fig" viewBox="0 0 1024 1024">
+    <path fill="currentColor" opacity="1.000000" stroke="none" 
+	d="
+M370.737488,867.592896 
+	C363.311676,883.767273 356.664246,899.865173 351.013153,916.336914 
+	C347.317841,927.108032 339.588715,933.286255 329.361603,936.712708 
+	C323.426025,938.701355 316.934784,933.835266 314.702148,926.950806 
+	C312.053986,918.784973 312.347198,910.416992 313.198578,902.189026 
+	C314.737366,887.318054 316.355469,872.433655 319.598053,857.783142 
+	C322.544525,844.470459 326.142944,831.345337 330.394409,818.403748 
+	C339.087555,791.941406 350.187225,766.536987 364.099335,742.378174 
+	C381.696228,711.820618 402.068176,683.307617 426.058960,657.401306 
+	C434.993469,647.753418 443.950775,637.973938 449.130768,625.649597 
+	C457.483032,605.777893 453.533020,579.869385 433.598724,565.916687 
+	C404.324402,545.426575 381.017914,519.563477 365.492828,486.997864 
+	C354.012695,462.916962 348.580627,437.713745 349.564362,411.056122 
+	C349.877686,402.565521 349.838806,394.078400 351.684601,385.718353 
+	C354.175842,374.434784 364.008667,369.639984 374.617096,374.143097 
+	C385.500763,378.763000 388.185944,388.067688 389.192200,398.353790 
+	C391.114014,417.998169 398.080078,435.699524 409.235992,451.848694 
+	C423.589661,472.626923 442.274078,488.330292 465.339264,498.529541 
+	C484.838562,507.151917 505.484314,511.110260 526.644043,508.373871 
+	C550.298950,505.314819 571.599915,495.829102 590.521057,481.050049 
+	C612.287598,464.048401 627.187561,442.234619 636.322693,416.407166 
+	C639.418701,407.653870 640.172974,398.281555 641.827393,389.159119 
+	C643.556152,379.626160 651.689453,372.499969 661.329590,372.140900 
+	C670.123657,371.813385 676.504395,378.764221 678.125427,389.903900 
+	C682.388916,419.202362 679.230896,447.860046 668.797241,475.330719 
+	C659.035278,501.032898 643.015503,522.924194 623.317017,542.140320 
+	C614.586975,550.656555 605.379517,558.631226 595.368286,565.482239 
+	C568.310791,583.998657 567.500610,613.828125 582.884521,637.468506 
+	C590.328430,648.907593 599.922241,658.802979 609.059631,668.940063 
+	C631.553162,693.894592 651.385742,720.744934 667.204102,750.407898 
+	C682.182434,778.495605 693.893372,807.931091 702.562195,838.594727 
+	C709.458130,862.987427 713.150085,887.870605 714.869873,913.091064 
+	C715.593811,923.707886 710.374084,933.227783 702.555054,936.227295 
+	C700.423706,937.044861 698.436462,937.141785 696.257080,936.363159 
+	C687.221497,933.135071 680.847168,927.162781 677.843201,918.035645 
+	C666.206238,882.678711 650.619751,849.151062 631.551758,817.212524 
+	C617.976379,794.473999 602.232788,773.482605 581.704285,756.494568 
+	C566.874268,744.222290 550.244690,735.099854 531.183289,731.592896 
+	C508.087677,727.343811 486.277710,731.369934 465.730133,743.067749 
+	C435.255951,760.416931 414.962280,787.223328 397.204315,816.288025 
+	C387.233856,832.606934 378.152130,849.482910 370.737488,867.592896 
+z"/>
+    <path fill="currentColor" opacity="1.000000" stroke="none" 
+	d="
+M439.453918,350.531647 
+	C439.319550,321.179718 469.074677,287.284454 499.638062,282.316437 
+	C527.854248,277.729950 550.993347,286.149628 569.774841,306.536804 
+	C583.071533,320.970215 589.453735,338.548279 588.549927,358.616608 
+	C587.092224,390.984344 570.391785,412.741486 541.898743,426.108734 
+	C517.615845,437.500885 485.953796,431.759888 466.078400,413.757996 
+	C453.049469,401.957214 444.196594,387.830353 440.338715,370.840454 
+	C438.888977,364.455963 438.342377,357.668762 439.453918,350.531647 
+z"/>
+  </symbol>
+</svg>
+
+<!-- ── THREE.JS CANVAS ── -->
+<canvas id="three-canvas"></canvas>
+
+<!-- ── PARTICLE CANVAS ── -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ── CHAPTER INDICATOR ── -->
+<div id="chapter-indicator">
+  <div class="ci-dot active" data-target="hero" title="Hero"></div>
+  <div class="ci-dot" data-target="origins" title="Origins"></div>
+  <div class="ci-dot" data-target="transform" title="Craft"></div>
+  <div class="ci-dot" data-target="pour" title="The Pour"></div>
+  <div class="ci-dot" data-target="lifestyle" title="Lifestyle"></div>
+  <div class="ci-dot" data-target="menu-section" title="Menu"></div>
+</div>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <svg viewBox="0 0 200 270" style="color:var(--amber)" aria-label="OMPO logo">
+      <use href="#fig"/>
+    </svg>
+    <span class="nav-logo-text"><em>OMPO</em></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#origins">Story</a></li>
+    <li><a href="#menu-section">Menu</a></li>
+    <li><a href="#lifestyle">Vibe</a></li>
+    <li><a href="#booking" class="nav-cta">Book Now</a></li>
+  </ul>
+</nav>
+
+<!-- ── SCROLL CONTAINER ── -->
+<div id="scroll-container">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-content" id="hero-content">
+      <span class="hero-eyebrow">Premium Hospitality · Nairobi</span>
+      <h1 class="hero-title">
+        OMPO
+        <span class="sub">Cocktails</span>
+      </h1>
+      <p class="hero-tagline">Its yours for the taking.<br>A journey from raw to refined.</p>
+      <div class="hero-btns">
+        <a href="#menu-section" class="btn-gold">View Menu</a>
+        <a href="#booking" class="btn-wire">Book an Event</a>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-bar"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- STRIP -->
+  <div class="strip" style="position:relative;z-index:2;">
+    <span class="strip-item">Signature Cocktails</span>
+    <span class="strip-dot"></span>
+    <span class="strip-item">Shots &amp; Spirits</span>
+    <span class="strip-dot"></span>
+    <span class="strip-item">Door Delivery</span>
+    <span class="strip-dot"></span>
+    <span class="strip-item">Custom Orders</span>
+    <span class="strip-dot"></span>
+    <span class="strip-item">Private Events</span>
+  </div>
+
+  <!-- ── CHAPTER 1: ORIGINS ── -->
+  <section class="journey-section" id="origins">
+    <div class="js-inner">
+      <div class="js-text reveal">
+        <span class="js-eyebrow">Chapter 01</span>
+        <h2 class="js-title">Where it all<br><em>begins.</em></h2>
+        <div class="js-divline"></div>
+        <p class="js-body">Every OMPO cocktail starts with intention. From the ginger pulled from Kenyan farms to the rich molasses, the dark roast coffee, and hand-picked strawberries — each ingredient carries a story before it meets the glass.</p>
+        <span class="js-tag">Raw · Organic · Intentional</span>
+      </div>
+      <div class="js-visual">
+        <div class="origins-art">
+          <div class="earth-ring er1"></div>
+          <div class="earth-ring er2"></div>
+          <div class="earth-ring er3"></div>
+          <div class="origin-center">
+            <span class="big">O</span>
+          </div>
+          <div class="ingredients-list" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:220px;">
+            <div class="ing-item"><span class="ing-dot"></span>Kenyan ginger &amp; fresh strawberry</div>
+            <div class="ing-item"><span class="ing-dot"></span>Dark roast coffee &amp; molasses</div>
+            <div class="ing-item"><span class="ing-dot"></span>Amarula &amp; Nairobi highland water</div>
+            <div class="ing-item"><span class="ing-dot"></span>Muratina — a cultural touch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAPTER 2: TRANSFORMATION ── -->
+  <section class="journey-section" id="transform">
+    <div class="js-inner reverse">
+      <div class="js-text reveal">
+        <span class="js-eyebrow">Chapter 02</span>
+        <h2 class="js-title">The art of<br><em>transformation.</em></h2>
+        <div class="js-divline"></div>
+        <p class="js-body">Mixing is where science meets artistry. Each OMPO cocktail is a precise ritual — measured shakes, calculated pours, temperature control, and a signature technique that creates the textures and flavours no other bar in Nairobi delivers.</p>
+        <span class="js-tag">Craft · Precision · Ritual</span>
+      </div>
+      <div class="js-visual">
+        <div class="transform-art">
+          <div class="cocktail-names-float">
+            <span class="cn-item">Pink Lady</span>
+            <span class="cn-item">Ms Steak</span>
+            <span class="cn-item">Midnight Kofi</span>
+            <span class="cn-item">Wheezee</span>
+            <span class="cn-item">Beef In</span>
+          </div>
+          <div class="shaker">
+            <div class="shaker-cap"></div>
+            <div class="shaker-top"></div>
+            <div class="shaker-body">
+              <div class="shaker-liquid"></div>
+            </div>
+            <div class="pour-drops">
+              <div class="drop"></div>
+              <div class="drop"></div>
+              <div class="drop"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAPTER 3: THE POUR ── -->
+  <section class="journey-section" id="pour">
+    <div class="js-inner">
+      <div class="js-text reveal">
+        <span class="js-eyebrow">Chapter 03</span>
+        <h2 class="js-title">The final<br><em>pour.</em></h2>
+        <div class="js-divline"></div>
+        <p class="js-body">When the glass is set and the liquid meets the light — that's the OMPO moment. Presentation is not an afterthought; it's the statement. The colour, the garnish, the glass — all choreographed to make you pause before the first sip.</p>
+        <span class="js-tag">Presentation · Aesthetic · Moment</span>
+      </div>
+      <div class="js-visual">
+        <div class="pour-art">
+          <div class="pour-stream"></div>
+          <div class="glass-3d">
+            <div class="glass-bowl">
+              <div class="glass-liquid"></div>
+              <span class="glass-label">OMPO</span>
+              <div class="garnish-piece"></div>
+            </div>
+            <div class="glass-rim"></div>
+            <div class="glass-stem"></div>
+            <div class="glass-base"></div>
+          </div>
+          <div class="glow-ring"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CHAPTER 4: LIFESTYLE ── -->
+  <section class="journey-section" id="lifestyle">
+    <div class="js-inner reverse">
+      <div class="js-text reveal">
+        <span class="js-eyebrow">Chapter 04</span>
+        <h2 class="js-title">A culture,<br><em>not just a drink.</em></h2>
+        <div class="js-divline"></div>
+        <p class="js-body">OMPO is the feeling in the room when the setup is right. The energy of a private party elevated by craft. The vibe of a curated gathering where every detail says something. This is hospitality as an identity — lived, felt, remembered.</p>
+        <span class="js-tag">Culture · Vibe · Identity</span>
+      </div>
+      <div class="js-visual">
+        <div class="lifestyle-art">
+          <div class="lifestyle-cards">
+            <div class="lc lc1">
+              <div class="lc-label">Private Events</div>
+              <div class="lc-text">Birthdays, anniversaries — every occasion elevated</div>
+              <svg class="lc-fig" viewBox="0 0 200 270" style="color:var(--amber)"><use href="#fig"/></svg>
+            </div>
+            <div class="lc lc2">
+              <div class="lc-label">Door Delivery</div>
+              <div class="lc-text">OMPO delivered to your door across Nairobi</div>
+              <svg class="lc-fig" viewBox="0 0 200 270" style="color:var(--amber)"><use href="#fig"/></svg>
+            </div>
+            <div class="lc lc3">
+              <div class="lc-label">Brand Activations</div>
+              <div class="lc-text">Pop-ups and lifestyle events with the OMPO stamp</div>
+              <svg class="lc-fig" viewBox="0 0 200 270" style="color:var(--amber)"><use href="#fig"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MENU ── -->
+  <section id="menu-section">
+    <div class="menu-wrapper">
+      <div class="menu-head reveal">
+        <span class="sec-tag">The Menu</span>
+        <h2 class="menu-title"><em>Its yours for the taking</em></h2>
+        <p class="menu-sub">Crafted with intention. Served with style.</p>
+      </div>
+      <div class="menu-cols">
+        <div class="reveal">
+          <div class="col-label">Cocktails</div>
+          <div class="menu-item"><div><div class="mi-name">Pink Lady</div><div class="mi-desc">Vodka &amp; Strawberry</div></div><div class="mi-price">350/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Ms Steak</div><div class="mi-desc">Whiskey &amp; Ginger</div></div><div class="mi-price">250/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Beef In</div><div class="mi-desc">Rum &amp; Molasses</div></div><div class="mi-price">250/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Midnight Kofi</div><div class="mi-desc">Gin &amp; Coffee</div></div><div class="mi-price">200/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Wheezee</div><div class="mi-desc">Whiskey, Amarula &amp; Choco</div></div><div class="mi-price">500/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Muratina</div><div class="mi-desc">Traditional fermented blend</div></div><div class="mi-price">250/=</div></div>
+        </div>
+        <div class="reveal">
+          <div class="col-label">Shots</div>
+          <div class="menu-item"><div><div class="mi-name">Red Label</div><div class="mi-desc">Johnnie Walker</div></div><div class="mi-price">450/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Smirnoff Vodka</div><div class="mi-desc">Classic clean vodka</div></div><div class="mi-price">350/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Whiskey &amp; Espresso</div><div class="mi-desc">Bold &amp; aromatic</div></div><div class="mi-price">350/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Captain Morgan</div><div class="mi-desc">Spiced rum</div></div><div class="mi-price">250/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Hunters</div><div class="mi-desc">Gold dry lemon</div></div><div class="mi-price">200/=</div></div>
+          <div class="menu-item"><div><div class="mi-name">Gilbeys</div><div class="mi-desc">London dry gin</div></div><div class="mi-price">200/=</div></div>
+        </div>
+        <div class="menu-divider">
+          <div class="md-line"></div>
+          <svg class="md-fig" viewBox="0 0 200 270" style="color:var(--amber)" aria-hidden="true"><use href="#fig"/></svg>
+          <div class="md-line"></div>
+        </div>
+      </div>
+      <div class="menu-note reveal">
+        <p><strong>Door Delivery — 0794 350 378</strong><br><br>We deliver across Nairobi. For custom orders, bespoke cocktails, or event bookings — call us or find us on Instagram <strong style="color:var(--amber2)">@_o_mpo</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MANIFESTO ── -->
+  <section id="manifesto">
+    <span class="mani-bg-txt">OMPO</span>
+    <svg class="mani-fig" viewBox="0 0 200 270" style="color:var(--ink)" aria-hidden="true"><use href="#fig"/></svg>
+    <p class="mani-quote">"We're doing the most important thing first — proving the concept in real life."</p>
+    <span class="mani-attr">OMPO — Nairobi, 2025</span>
+  </section>
+
+  <!-- ── BOOKING ── -->
+  <section id="booking">
+    <div class="booking-inner">
+      <div class="booking-info reveal">
+        <div class="bi-logo-row">
+          <svg class="bi-fig" viewBox="0 0 200 270" style="color:var(--amber)" aria-hidden="true"><use href="#fig"/></svg>
+          <span class="bi-name"><em>OMPO</em></span>
+        </div>
+        <span class="sec-tag">Get in Touch</span>
+        <h2>Let's create<br>something <span>memorable.</span></h2>
+        <p class="bi-sub">Tell us about your event or order and we'll get back to you fast.</p>
+        <ul class="contact-list">
+          <li><strong>Phone</strong> 0794 350 378</li>
+          <li><strong>Delivery</strong> Nairobi-wide door delivery available</li>
+          <li><strong>Instagram</strong> @_o_mpo</li>
+          <li><strong>Custom</strong> Call to build a bespoke cocktail menu</li>
+        </ul>
+      </div>
+      <div class="form-card reveal">
+        <form id="bookingForm" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <div class="form-group"><label for="fn">First Name</label><input type="text" id="fn" placeholder="Your first name" required></div>
+            <div class="form-group"><label for="ln">Last Name</label><input type="text" id="ln" placeholder="Your last name" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label for="ph">Phone</label><input type="tel" id="ph" placeholder="+254 700 000 000" required></div>
+            <div class="form-group"><label for="ig2">Instagram (optional)</label><input type="text" id="ig2" placeholder="@yourhandle"></div>
+          </div>
+          <div class="form-group">
+            <label for="svc">What do you need?</label>
+            <select id="svc" required>
+              <option value="" disabled selected>Choose a service</option>
+              <option>Mobile Cocktail Bar (Event)</option>
+              <option>Cocktail Delivery</option>
+              <option>Custom Cocktail Order</option>
+              <option>Full Event Curation</option>
+              <option>Brand Activation / Pop-up</option>
+              <option>Other / Not Sure Yet</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label for="dt">Date Needed</label><input type="date" id="dt"></div>
+            <div class="form-group">
+              <label for="gs">Guest Count</label>
+              <select id="gs">
+                <option value="" disabled selected>Approx. guests</option>
+                <option>1 – 20</option><option>21 – 50</option><option>51 – 100</option><option>100+</option><option>Delivery only</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label for="msg">Tell us more</label><textarea id="msg" placeholder="Describe your event, vibe, location, or any special requests..."></textarea></div>
+          <button type="submit" class="form-submit">Send Enquiry →</button>
+          <p class="form-note">Or call us directly — 0794 350 378 · @_o_mpo</p>
+        </form>
+        <div class="success-msg" id="successMsg">
+          <svg style="width:48px;color:var(--amber);margin-bottom:1.2rem" viewBox="0 0 200 270" aria-hidden="true"><use href="#fig"/></svg>
+          <p>Your enquiry has been received.<br>We'll be in touch very soon.<br><br><span style="font-size:.78rem;color:rgba(184,131,42,.55)">0794 350 378 · @_o_mpo</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="f-logo-row">
+      <svg class="f-fig" viewBox="0 0 200 270" style="color:var(--amber)" aria-hidden="true"><use href="#fig"/></svg>
+      <span class="f-name"><em>OMPO</em></span>
+    </div>
+    <div class="f-links">
+      <a href="#origins">Story</a>
+      <a href="#menu-section">Menu</a>
+      <a href="#lifestyle">Vibe</a>
+      <a href="#booking">Book</a>
+    </div>
+    <span class="f-ig">@_o_mpo</span>
+    <span class="f-copy">© 2025 OMPO Nairobi</span>
+  </footer>
+
+</div><!-- end scroll-container -->
+
+<!-- ── SCRIPTS: Three.js + GSAP ── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+/* ─────────────────────────────────────────────
+   CURSOR
+───────────────────────────────────────────── */
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+});
+(function tickCursor() {
+  rx += (mx - rx) * 0.13; ry += (my - ry) * 0.13;
+  cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(tickCursor);
+})();
+document.querySelectorAll('a,button,.ci-dot').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.width = '18px'; cursor.style.height = '18px'; cursor.style.background = 'rgba(184,131,42,.4)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.width = '8px'; cursor.style.height = '8px'; cursor.style.background = 'var(--amber)'; });
+});
+
+/* ─────────────────────────────────────────────
+   THREE.JS — 3D FLOATING GLASS & PARTICLES
+───────────────────────────────────────────── */
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x000000, 0);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 5);
+
+/* Ambient + directional lights */
+const ambientLight = new THREE.AmbientLight(0xffeedd, 0.4);
+scene.add(ambientLight);
+const dirLight1 = new THREE.DirectionalLight(0xB8832A, 1.2);
+dirLight1.position.set(5, 5, 5);
+scene.add(dirLight1);
+const dirLight2 = new THREE.DirectionalLight(0x3333aa, 0.4);
+dirLight2.position.set(-5, -3, -5);
+scene.add(dirLight2);
+const pointLight = new THREE.PointLight(0xD4A84B, 2, 8);
+pointLight.position.set(0, 2, 3);
+scene.add(pointLight);
+
+/* ── GLASS GEOMETRY — cocktail glass silhouette ── */
+const glassGroup = new THREE.Group();
+scene.add(glassGroup);
+
+/* Bowl (lathe geometry for cocktail glass) */
+const bowlPoints = [];
+for (let i = 0; i <= 20; i++) {
+  const t = i / 20;
+  const y = t * 1.4 - 0.7;
+  const r = 0.15 + t * 0.65;
+  bowlPoints.push(new THREE.Vector2(r, y));
+}
+const bowlGeo = new THREE.LatheGeometry(bowlPoints, 32);
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xB8832A,
+  metalness: 0.1,
+  roughness: 0.05,
+  transmission: 0.85,
+  thickness: 0.4,
+  transparent: true,
+  opacity: 0.35,
+  side: THREE.DoubleSide,
+  wireframe: false,
+});
+const bowl = new THREE.Mesh(bowlGeo, glassMat);
+bowl.position.y = 0.4;
+glassGroup.add(bowl);
+
+/* Bowl wireframe outline */
+const wireMat = new THREE.MeshBasicMaterial({ color: 0xB8832A, wireframe: true, opacity: 0.08, transparent: true });
+const wireframe = new THREE.Mesh(bowlGeo, wireMat);
+wireframe.position.y = 0.4;
+glassGroup.add(wireframe);
+
+/* Stem */
+const stemGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.2, 16);
+const stemMat = new THREE.MeshPhysicalMaterial({ color: 0xD4A84B, metalness: 0.2, roughness: 0.1, transparent: true, opacity: 0.5 });
+const stem = new THREE.Mesh(stemGeo, stemMat);
+stem.position.y = -0.6;
+glassGroup.add(stem);
+
+/* Base */
+const baseGeo = new THREE.CylinderGeometry(0.5, 0.4, 0.06, 32);
+const base = new THREE.Mesh(baseGeo, stemMat);
+base.position.y = -1.22;
+glassGroup.add(base);
+
+/* Liquid inside */
+const liquidPoints = [];
+for (let i = 0; i <= 12; i++) {
+  const t = i / 12;
+  const y = t * 0.9 - 0.7;
+  const r = 0.12 + t * 0.58;
+  liquidPoints.push(new THREE.Vector2(r * 0.88, y));
+}
+const liquidGeo = new THREE.LatheGeometry(liquidPoints, 32);
+const liquidMat = new THREE.MeshPhysicalMaterial({
+  color: 0xB8832A,
+  transparent: true,
+  opacity: 0.28,
+  metalness: 0,
+  roughness: 0.3,
+  emissive: 0x3a2200,
+  emissiveIntensity: 0.3,
+});
+const liquid = new THREE.Mesh(liquidGeo, liquidMat);
+liquid.position.y = 0.38;
+glassGroup.add(liquid);
+
+glassGroup.position.set(2.5, 0, 0);
+glassGroup.scale.set(0.9, 0.9, 0.9);
+
+/* ── FLOATING PARTICLES ── */
+const particleCount = 180;
+const particleGeo = new THREE.BufferGeometry();
+const positions = new Float32Array(particleCount * 3);
+const particleSpeeds = new Float32Array(particleCount);
+const particleSizes = new Float32Array(particleCount);
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3]     = (Math.random() - 0.5) * 12;
+  positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
+  particleSpeeds[i] = 0.002 + Math.random() * 0.006;
+  particleSizes[i] = Math.random() * 3 + 1;
+}
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const particleMat = new THREE.PointsMaterial({ color: 0xB8832A, size: 0.04, transparent: true, opacity: 0.45, sizeAttenuation: true });
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+/* ── ORBITAL RINGS (decorative) ── */
+function makeRing(radius, color, opacity) {
+  const geo = new THREE.TorusGeometry(radius, 0.008, 8, 80);
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity });
+  const ring = new THREE.Mesh(geo, mat);
+  return ring;
+}
+const ring1 = makeRing(1.8, 0xB8832A, 0.15);
+const ring2 = makeRing(2.4, 0xD4A84B, 0.08);
+const ring3 = makeRing(3.1, 0xB8832A, 0.05);
+ring1.rotation.x = Math.PI / 3;
+ring2.rotation.x = Math.PI / 5;
+ring2.rotation.z = Math.PI / 4;
+ring3.rotation.x = Math.PI / 2.2;
+ring3.rotation.y = Math.PI / 6;
+scene.add(ring1); scene.add(ring2); scene.add(ring3);
+
+/* Mouse tracking for camera */
+let targetCamX = 0, targetCamY = 0, currentCamX = 0, currentCamY = 0;
+document.addEventListener('mousemove', e => {
+  targetCamX = (e.clientX / window.innerWidth - 0.5) * 0.6;
+  targetCamY = -(e.clientY / window.innerHeight - 0.5) * 0.4;
+});
+
+/* Scroll-based scene state */
+let scrollProgress = 0;
+window.addEventListener('scroll', () => {
+  scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+});
+
+/* ── GSAP SCROLL ANIMATIONS for 3D scene ── */
+gsap.registerPlugin(ScrollTrigger);
+
+/* Glass travels across sections on scroll */
+ScrollTrigger.create({
+  trigger: '#scroll-container',
+  start: 'top top',
+  end: 'bottom bottom',
+  onUpdate: self => {
+    const p = self.progress;
+    /* Glass X: start right, move left, then center */
+    glassGroup.position.x = 2.5 - p * 5;
+    /* Glass Y: float up then down */
+    glassGroup.position.z = Math.sin(p * Math.PI) * 1.5;
+    /* Glass scale: grows then shrinks */
+    const sc = 0.9 + Math.sin(p * Math.PI) * 0.4;
+    glassGroup.scale.set(sc, sc, sc);
+    /* Liquid opacity: increases as journey progresses */
+    liquidMat.opacity = 0.1 + p * 0.35;
+    liquidMat.color.setHSL(0.09, 0.7, 0.2 + p * 0.25);
+    /* Ambient light color shift: earthy → golden → white */
+    if (p < 0.5) {
+      ambientLight.color.setHSL(0.08, 0.6, 0.3 + p * 0.4);
+    } else {
+      ambientLight.color.setHSL(0.1 + (p - 0.5) * 0.1, 0.5 - (p - 0.5) * 0.3, 0.5 + (p - 0.5) * 0.3);
+    }
+  }
+});
+
+/* ── ANIMATION LOOP ── */
+let clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  /* Smooth camera follow mouse */
+  currentCamX += (targetCamX - currentCamX) * 0.05;
+  currentCamY += (targetCamY - currentCamY) * 0.05;
+  camera.position.x = currentCamX;
+  camera.position.y = currentCamY;
+  camera.lookAt(0, 0, 0);
+
+  /* Glass idle rotation */
+  glassGroup.rotation.y = t * 0.25 + currentCamX * 0.5;
+  glassGroup.rotation.x = Math.sin(t * 0.3) * 0.08 + currentCamY * 0.3;
+
+  /* Particles drift */
+  const pos = particleGeo.attributes.position.array;
+  for (let i = 0; i < particleCount; i++) {
+    pos[i * 3 + 1] += particleSpeeds[i];
+    if (pos[i * 3 + 1] > 5) pos[i * 3 + 1] = -5;
+  }
+  particleGeo.attributes.position.needsUpdate = true;
+
+  /* Ring rotation */
+  ring1.rotation.z += 0.003;
+  ring2.rotation.z -= 0.002;
+  ring3.rotation.y += 0.001;
+
+  /* Point light orbit */
+  pointLight.position.x = Math.sin(t * 0.7) * 3;
+  pointLight.position.y = Math.cos(t * 0.5) * 2;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* Resize */
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ─────────────────────────────────────────────
+
+/* ─────────────────────────────────────────────
+   GSAP PAGE ANIMATIONS
+───────────────────────────────────────────── */
+
+/* Hero entrance */
+gsap.to('#hero-content', {
+  opacity: 1, y: 0, duration: 1.4, ease: 'power3.out', delay: 0.4
+});
+
+/* Scroll reveal for section text */
+document.querySelectorAll('.reveal').forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1, y: 0, duration: 1, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 82%', toggleActions: 'play none none none' }
+    }
+  );
+});
+
+/* Journey section titles — staggered */
+document.querySelectorAll('.js-title').forEach(el => {
+  gsap.fromTo(el,
+    { opacity: 0, x: -40 },
+    { opacity: 1, x: 0, duration: 1.1, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 80%' }
+    }
+  );
+});
+
+/* Parallax on section backgrounds */
+document.querySelectorAll('.journey-section').forEach(section => {
+  gsap.to(section, {
+    backgroundPositionY: '30%',
+    ease: 'none',
+    scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 1 }
+  });
+});
+
+/* Nav background on scroll */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('bg', window.scrollY > 60);
+});
+
+/* Progress bar */
+window.addEventListener('scroll', () => {
+  const p = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  document.getElementById('progress-bar').style.width = (p * 100) + '%';
+});
+
+/* Chapter indicator */
+const chapters = ['hero','origins','transform','pour','lifestyle','menu-section'];
+const dots = document.querySelectorAll('.ci-dot');
+dots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    document.getElementById(chapters[i]).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+const chapterObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      const idx = chapters.indexOf(id);
+      if (idx >= 0) {
+        dots.forEach(d => d.classList.remove('active'));
+        dots[idx].classList.add('active');
+      }
+    }
+  });
+}, { threshold: 0.4 });
+chapters.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) chapterObserver.observe(el);
+});
+
+/* Menu item hover 3D tilt */
+document.querySelectorAll('.svc-card,.ev-card,.lc').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    card.style.transform = `perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 7}deg)`;
+  });
+  card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+});
+
+/* Form submit */
+function handleSubmit(e) {
+  e.preventDefault();
+  document.getElementById('bookingForm').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'block';
+}
+</script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
